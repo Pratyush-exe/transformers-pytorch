@@ -150,7 +150,7 @@ class MultiHeadAttention(nn.Module):
         # (batch, heads, seq_len, head_dims)
         sa = SelfAttention(self.embed_dims)
         attention_scores, attention_values = sa.calculate(key, query, value, mask)
-        # use attention_scores for visualization
+        self.attention_scores = attention_scores
         
         # (batch, heads, seq_len, head_dims) -> (batch, seq_len, head_dims)
         output = self.concatinate_heads(attention_values)
