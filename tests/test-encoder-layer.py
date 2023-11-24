@@ -37,3 +37,5 @@ masked_mha_output = encoder_layer_1(k, q, v, mask=True)
 assert masked_mha_output.shape == k.shape, "shapes not match"
 print(masked_mha_output.shape)
 print(encoder_layer_1.mha_layer_1.attention_scores[0][0])
+
+print(encoder_layer_1)
