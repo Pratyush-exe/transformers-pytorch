@@ -1,5 +1,5 @@
 from torch import nn, Tensor
-from attentions import *
+from .attentions import *
 
 
 class EncoderLayer(nn.Module):
@@ -8,23 +8,25 @@ class EncoderLayer(nn.Module):
     def __init__(self, config):
         super().__init__()
         
-        self.embed_dims = config['embed_dims']
-        self.heads = config['heads']
-        self.dropout = config['dropout']
-        self.device = config['device']
+        embed_dims = config['embed_dims']
+        heads = config['heads']
+        dropout = config['dropout']
+        
+        device = config['device']
         ff_layer_sizes = config['ff_layer_sizes']
-        self.device = config['device']
         
-        self.mha_layer_1 = MultiHeadAttention(
-            embed_dims=self.embed_dims, 
-            heads=self.heads, 
-            dropout=self.dropout
-        )
+        assert embed_dims  == ff_layer_sizes[0] == ff_layer_sizes[-1], "FF layer sizes not match"
         
-        self.norm_layer_1 = nn.LayerNorm()
-        self.norm_layer_2 = nn.LayerNorm()
+        self.norm_layer_1 = nn.LayerNorm(embed_dims)
+        self.norm_layer_2 = nn.LayerNorm(embed_dims)
         self.feed_forward = self.create_sequential_model(ff_layer_sizes)
-        
+        self.mha_layer_1 = MultiHeadAttention(
+            embed_dims=embed_dims, 
+            heads=heads, 
+            dropout=dropout,
+            device=device
+        )
+          
     def forward(self, 
         key: Tensor,
         query: Tensor,
@@ -49,7 +51,7 @@ class EncoderLayer(nn.Module):
         
         return norm_output_2
         
-    def create_sequential_model(sizes):
+    def create_sequential_model(self, sizes):
         """given list of sizes, returns nn.Sequential layer
 
         Args:
