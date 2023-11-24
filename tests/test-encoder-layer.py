@@ -27,9 +27,9 @@ v = torch.rand((batch_size, seq_len, embed_dims))
 encoder_layer_1 = EncoderLayer(config)
 
 print("\nUnmasked Single Encoder Layer")
-unmasked_mha_output = encoder_layer_1(k, q, v, mask=False)
-assert unmasked_mha_output.shape == k.shape, "shapes not match"
-print(unmasked_mha_output.shape)
+encoder_layer_output = encoder_layer_1(k, q, v, mask=False)
+assert encoder_layer_output.shape == k.shape, "shapes not match"
+print(encoder_layer_output.shape)
 print(encoder_layer_1.mha_layer_1.attention_scores[0][0])
 
 print("\nMasked Single Encoder Layer")

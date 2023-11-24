@@ -1,5 +1,6 @@
 from torch import nn, Tensor
 from .attentions import *
+from .embeddings import *
 
 
 class EncoderLayer(nn.Module):
@@ -21,7 +22,7 @@ class EncoderLayer(nn.Module):
         self.norm_layer_2 = nn.LayerNorm(embed_dims)
         self.feed_forward = self.create_sequential_model(ff_layer_sizes)
         self.mha_layer_1 = MultiHeadAttention(
-            embed_dims=embed_dims, 
+            embed_dims=embed_dims,  
             heads=heads, 
             dropout=dropout,
             device=device
@@ -74,5 +75,33 @@ class EncoderLayer(nn.Module):
 
 
 class Encoder(nn.Module):
-    ...
+    """Encoder layer for transformer model
+    """
+    def __init__(self, config) -> None:
+        super().__init__()
     
+        num_layers = config['num_layers']
+        self.embedding_layer = PytorchEmbedding(config)
+        self.positional_encoder = PositionalEmbedding(config)
+        
+        self.encoder_layers = nn.ModuleList(
+            [EncoderLayer(config) for _ in range(num_layers)]
+        )
+    
+    def forward(self, x):
+        """Forward function for Encoder class
+
+        Args:
+            x (Tensor): input tensor
+
+        Returns:
+            output (Tensor): output tensor
+        """
+        embed_output = self.embedding_layer(x)
+        output = self.positional_encoder(embed_output)
+        
+        for layer in self.encoder_layers:
+            output = layer(output, output, output)
+            
+        return output
+        
