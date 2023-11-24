@@ -16,14 +16,14 @@ class PositionalEmbedding(nn.Module):
         
         for position in range(max_seq_len):
             for i in range(0, self.embed_dims, 2):
-                even_angle = position / (10000 ** ((2 * i) / self.embed_dim))
+                even_angle = position / (10000 ** ((2 * i) / self.embed_dims))
                 positional_embedding[position, i] = math.sin(even_angle)
                 
-                odd_angle = position / (10000 ** ((2 * (i+1)) / self.embed_dim))
+                odd_angle = position / (10000 ** ((2 * (i+1)) / self.embed_dims))
                 positional_embedding[position, i+1] = math.cos(odd_angle)
         
         positional_embedding = positional_embedding.unsqueeze(0)
-        self.register_buffer(positional_embedding)
+        self.register_buffer('positional_embedding', positional_embedding)
         
     def forward(self, x):
         x = x * math.sqrt(self.embed_dims)
