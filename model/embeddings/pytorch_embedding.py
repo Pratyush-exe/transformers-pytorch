@@ -1,6 +1,6 @@
 from torch import nn
 
-class PytorchEmbedding(nn.Module):
+class Embedding(nn.Module):
     """class for pytorch nn.Embedding
     """
     def __init__(self, config):
@@ -8,10 +8,11 @@ class PytorchEmbedding(nn.Module):
         vocab_size = config['vocab_size']
         embed_dims = config['embed_dims']
         
-        self.embed = nn.Embedding(vocab_size, embed_dims)
+        self.embed_1 = nn.Embedding(vocab_size, embed_dims)
+        self.embed_2 = nn.Embedding(vocab_size, embed_dims)
         
     def forward(self, x):
-        """forward function for PytorchEmbedding
+        """forward function for Embedding
 
         Args:
             x (Tensor): input vector
@@ -19,5 +20,6 @@ class PytorchEmbedding(nn.Module):
         Returns:
             output (Tensor): output vector
         """
-        output = self.embed(x)
+        output = self.embed_1(x)
+        output += self.embed_2(x)
         return output

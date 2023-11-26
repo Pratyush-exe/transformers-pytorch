@@ -75,10 +75,10 @@ class MultiHeadAttention(nn.Module):
         assert embed_dims % heads == 0, "embed_dims sould be divisible by heads"
         self.head_dims = embed_dims // heads
         
-        self.key_layer = nn.Linear(embed_dims, embed_dims, bias=False, device=device)
-        self.query_layer = nn.Linear(embed_dims, embed_dims, bias=False, device=device)
-        self.value_layer = nn.Linear(embed_dims, embed_dims, bias=False, device=device)
-        self.output_layer = nn.Linear(embed_dims, embed_dims, bias=False, device=device)
+        self.key_layer = nn.Linear(self.head_dims, self.head_dims, bias=False, device=device)
+        self.query_layer = nn.Linear(self.head_dims, self.head_dims, bias=False, device=device)
+        self.value_layer = nn.Linear(self.head_dims, self.head_dims, bias=False, device=device)
+        self.output_layer = nn.Linear(self.embed_dims, self.embed_dims, bias=False, device=device)
         
         self.dropout_layer = nn.Dropout(p=dropout)
         
@@ -138,14 +138,13 @@ class MultiHeadAttention(nn.Module):
             value (Tensor): (batch, seq_len, embed_dims)
             mask (bool, optional): Defaults to False.
         """
+        key = self.split_heads(key)
+        query = self.split_heads(query)
+        value = self.split_heads(value)
         
         key = self.key_layer(key)
         query = self.query_layer(query)
         value = self.value_layer(value)
-        
-        key = self.split_heads(key)
-        query = self.split_heads(query)
-        value = self.split_heads(value)
         
         # (batch, heads, seq_len, head_dims)
         sa = SelfAttention(self.embed_dims)

@@ -9,6 +9,7 @@ class EncoderLayer(nn.Module):
     def __init__(self, config):
         super().__init__()
         
+        self.config = config
         embed_dims = config['embed_dims']
         heads = config['heads']
         dropout = config['dropout']
@@ -27,7 +28,7 @@ class EncoderLayer(nn.Module):
             dropout=dropout,
             device=device
         )
-          
+        
     def forward(self, 
         key: Tensor,
         query: Tensor,
@@ -42,6 +43,10 @@ class EncoderLayer(nn.Module):
             value (Tensor): (batch, seq_len, embed_dims)
             mask (bool, optional): Defaults to False.
         """
+        
+        key = key.to(self.config['device'])
+        query = query.to(self.config['device'])
+        value = value.to(self.config['device'])
         
         mha_output = self.mha_layer_1(key, query, value, mask)
         add_output_1 = mha_output + value
@@ -81,8 +86,6 @@ class Encoder(nn.Module):
         super().__init__()
     
         num_layers = config['num_layers']
-        self.embedding_layer = PytorchEmbedding(config)
-        self.positional_encoder = PositionalEmbedding(config)
         
         self.encoder_layers = nn.ModuleList(
             [EncoderLayer(config) for _ in range(num_layers)]
@@ -97,11 +100,13 @@ class Encoder(nn.Module):
         Returns:
             output (Tensor): output tensor
         """
-        embed_output = self.embedding_layer(x)
-        output = self.positional_encoder(embed_output)
+        output = x.clone()
         
         for layer in self.encoder_layers:
-            output = layer(output, output, output)
+            key = output.clone()
+            query = output.clone()
+            value = output.clone()
+            output = layer(key, query, value)
             
         return output
         
