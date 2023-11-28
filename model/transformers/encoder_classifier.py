@@ -22,6 +22,7 @@ class EncoderClassifier(nn.Module):
     def forward(self, x):
         output = self.embed_layer(x)
         output = self.encoder(output)
+        output = output.mean(dim=0)
         output = self.classifier_head(output)
         
         return output 
