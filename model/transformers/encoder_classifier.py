@@ -12,10 +12,10 @@ class EncoderClassifier(nn.Module):
         embed_dims = config['embed_dims']
         
         self.classifier_head = nn.Sequential(
-            nn.Linear(embed_dims, embed_dims),
+            nn.Linear(embed_dims, embed_dims, device=config['device']),
             nn.ReLU(),
             nn.Dropout(config['dropout']),
-            nn.Linear(embed_dims, config['num_classes']),
+            nn.Linear(embed_dims, config['num_classes'], device=config['device']),
             nn.Softmax(dim=1),
         )
         

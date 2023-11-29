@@ -8,8 +8,8 @@ class Embedding(nn.Module):
         vocab_size = config['vocab_size']
         embed_dims = config['embed_dims']
         
-        self.embed_1 = nn.Embedding(vocab_size, embed_dims)
-        self.embed_2 = nn.Embedding(vocab_size, embed_dims)
+        self.embed_1 = nn.Embedding(vocab_size, embed_dims, device=config['device'])
+        self.embed_2 = nn.Embedding(vocab_size, embed_dims, device=config['device'])
         
     def forward(self, x):
         """forward function for Embedding
@@ -20,6 +20,6 @@ class Embedding(nn.Module):
         Returns:
             output (Tensor): output vector
         """
-        output = self.embed_1(x)
-        output += self.embed_2(x)
+        output = self.embed_2(x) + self.embed_1(x)
+        
         return output
